@@ -57,6 +57,7 @@ function run() {
         unload()
         globalThis.removeEventListener("unload", unload)
         clearTimeout(timeoutId)
+        clearInterval(id);
         timeoutId = setTimeout(run, 60000)
         console.log("dead")
     })
@@ -64,6 +65,7 @@ function run() {
     client.on("disconnected", () => {
         globalThis.removeEventListener("unload", unload)
         clearTimeout(timeoutId)
+        clearInterval(id);
         timeoutId = setTimeout(run, 60000)
         console.log("dead")
     })

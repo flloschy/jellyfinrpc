@@ -78,7 +78,6 @@ export class Jellyfin {
                 const itemName = item.Name as string
                 const year = item.ProductionYear as number
                 const artists = item.Artists as string[]
-                const image = item.ImageTags.Primary ?? item.AlbumPrimaryImageTag as string
                 const kind = item.Type as string
                 const id = item.Id as string
                 const artistId = item.ArtistItems[0].Id
@@ -90,7 +89,6 @@ export class Jellyfin {
                     itemName,
                     year,
                     artists,
-                    image,
                     artistId,
                     kind
                 }
@@ -102,7 +100,6 @@ export class Jellyfin {
                 const itemName = item.Name as string
                 const year = Math.round(playstate.PositionTicks / item.RunTimeTicks * 100 ) + "% Watched"
                 const artists = [(item.SeriesName as string) + " | " + (item.SeasonName as string)]
-                const image = item.ImageTags.Primary ?? item.ParentLogoImageTag as string
                 const kind = item.Type as string
                 const id = item.Id as string
                 const artistId = undefined
@@ -114,7 +111,6 @@ export class Jellyfin {
                     itemName,
                     year,
                     artists,
-                    image,
                     artistId,
                     kind
                 }
@@ -126,7 +122,6 @@ export class Jellyfin {
                 const itemName = item.Name as string
                 const year = Math.round(playstate.PositionTicks / item.RunTimeTicks * 100) + "% Watched"
                 const artists = [""]
-                const image = item.ImageTags.Primary as string
                 const kind = item.Type as string
                 const id = item.Id as string
                 const artistId = undefined
@@ -138,7 +133,6 @@ export class Jellyfin {
                     itemName,
                     year,
                     artists,
-                    image,
                     artistId,
                     kind
                 }
@@ -156,8 +150,8 @@ export class Jellyfin {
                 type: playback.kind == "Audio" ? ActivityType.Listening : ActivityType.Streaming,
                 startTimestamp: playback.paused ? undefined : Math.floor(Date.now()/1000 - playback.listened),
                 endTimestamp: playback.paused ? undefined : Math.ceil(Date.now()/1000 + (playback.length - playback.listened)),
-                largeImageKey: this.url + `Items/${playback.id}/Images/Primary?fillWidth=300&fillHeight=300&tag=${playback.image}&quality=90`,
-                smallImageKey: playback.artistId ? this.url + `Items/${playback.artistId}/Images/Primary?fillWidth=30&fillHeight=30&quality=90` : undefined
+                largeImageKey: this.url + `Items/${playback.id}/Images/Primary`,
+                smallImageKey: playback.artistId ? this.url + `Items/${playback.artistId}/Images/Primary` : undefined
             }
         } catch (e) {
             return false;
