@@ -4,7 +4,7 @@ deno install
 echo 
 echo 
 echo "You need to login to your jellyfin once "
-echo 
+echo "USE YOUR PUBLIC ADDRESS"
 echo 
 
 deno run --env-file --allow-env --allow-net --allow-read --allow-write main.ts
