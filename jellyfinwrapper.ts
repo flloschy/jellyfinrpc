@@ -80,16 +80,18 @@ export class Jellyfin {
                 const artists = item.Artists as string[]
                 const kind = item.Type as string
                 const id = item.Id as string
-                const artistId = item.ArtistItems[0].Id
+                const parentId = item.ParentLogoItemId as string
+                const artistIds = item.ArtistItems.map((a: any) => a.Id) as string[]
                 return {
                     id,
+                    parentId,
                     length,
                     listened,
                     paused,
                     itemName,
                     year,
                     artists,
-                    artistId,
+                    artistIds,
                     kind
                 }
             }
@@ -102,16 +104,18 @@ export class Jellyfin {
                 const artists = [(item.SeriesName as string) + " | " + (item.SeasonName as string)]
                 const kind = item.Type as string
                 const id = item.Id as string
-                const artistId = undefined
+                const parentId = item.ParentLogoItemId as string
+                const artistIds = [] as string[]
                 return {
                     id,
+                    parentId,
                     length,
                     listened,
                     paused,
                     itemName,
                     year,
                     artists,
-                    artistId,
+                    artistIds,
                     kind
                 }
             }
@@ -124,16 +128,18 @@ export class Jellyfin {
                 const artists = [""]
                 const kind = item.Type as string
                 const id = item.Id as string
-                const artistId = undefined
+                const parentId = item.ParentLogoItemId as string
+                const artistIds = [] as string[]
                 return {
                     id,
+                    parentId,
                     length,
                     listened,
                     paused,
                     itemName,
                     year,
                     artists,
-                    artistId,
+                    artistIds,
                     kind
                 }
             }
@@ -144,14 +150,40 @@ export class Jellyfin {
         try {
             const playback = await this.getPlayback();
             if (!playback) return false;
+            let smallImageKey = undefined;
+            for (const id of playback.artistIds.reverse()) {
+                const url = this.url + `Items/${id}/Images/Primary`
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        Authorization: this.header!,
+                        "Content-Type": "application/json",
+                    },
+                })
+                if (response.ok) smallImageKey = url;
+            }
+
+            let largeImageKey;
+            for (const id of [playback.parentId, playback.id]) {
+                const url = this.url + `Items/${id}/Images/Primary`
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        Authorization: this.header!,
+                        "Content-Type": "application/json",
+                    },
+                })
+                if (response.ok) largeImageKey = url;
+            }
+
             return {
                 details: playback.itemName,
                 state: `${playback.artists.join(",")}${playback.year ? " (" + playback.year + ")" : ""}`,
                 type: playback.kind == "Audio" ? ActivityType.Listening : ActivityType.Streaming,
                 startTimestamp: playback.paused ? undefined : Math.floor(Date.now()/1000 - playback.listened),
                 endTimestamp: playback.paused ? undefined : Math.ceil(Date.now()/1000 + (playback.length - playback.listened)),
-                largeImageKey: this.url + `Items/${playback.id}/Images/Primary`,
-                smallImageKey: playback.artistId ? this.url + `Items/${playback.artistId}/Images/Primary` : undefined
+                largeImageKey,
+                smallImageKey
             }
         } catch (e) {
             return false;
