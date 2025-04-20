@@ -69,7 +69,6 @@ export class Jellyfin {
         
         const playstate = session.PlayState
         const item = session.NowPlayingItem
-        console.log(item)
         
         switch (item.Type) {
             case "Audio": {
