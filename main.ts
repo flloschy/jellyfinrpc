@@ -38,8 +38,10 @@ function run() {
                 await client.user?.setActivity(activity as SetActivity);
             } else {
                 failCounter++
-                if (failCounter > 3) {
+                if (failCounter >= 2) {
                     await client.user?.clearActivity();
+                }
+                if (failCounter == 4) {
                     clearInterval(id);
                     id = setInterval(passiveInterval, 30000);
                 }
