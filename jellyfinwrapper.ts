@@ -63,7 +63,6 @@ export class Jellyfin {
 
         const data = await response.json()
         const session = (data as any[])
-            .filter(e => e.IsActive)
             .sort((a, b) => new Date(a.LastActivityDate).getTime() - new Date(b.LastActivityDate).getTime())
             .at(-1)
         
@@ -99,8 +98,8 @@ export class Jellyfin {
                 const length = item.RunTimeTicks / 10_000_000 as number
                 const listened = playstate.PositionTicks / 10_000_000 as number
                 const paused = playstate.IsPaused as boolean
-                const itemName = item.Name + " | "+ item.SeasonName
-                const year = Math.round(playstate.PositionTicks / item.RunTimeTicks * 100 ) + "% Watched"
+                const itemName = item.Name + " | " + item.SeasonName
+                const year = Math.round(playstate.PositionTicks / item.RunTimeTicks * 100 ) + "% Progress"
                 const artists = [(item.SeriesName as string)]
                 const kind = item.Type as string
                 const id = item.Id as string
@@ -124,7 +123,7 @@ export class Jellyfin {
                 const listened = playstate.PositionTicks / 10_000_000 as number
                 const paused = playstate.IsPaused as boolean
                 const itemName = item.Name as string
-                const year = Math.round(playstate.PositionTicks / item.RunTimeTicks * 100) + "% Watched"
+                const year = Math.round(playstate.PositionTicks / item.RunTimeTicks * 100) + "% Progress"
                 const artists = [""]
                 const kind = item.Type as string
                 const id = item.Id as string
