@@ -83,7 +83,6 @@ export class Jellyfin {
                 const kind = item.Type as string
                 const id = item.Id as string
                 const artistId = item.ArtistItems[0].Id
-                console.log(item)
                 return {
                     id,
                     length,
@@ -102,7 +101,7 @@ export class Jellyfin {
                 const listened = playstate.PositionTicks / 10_000_000 as number
                 const paused = playstate.IsPaused as boolean
                 const itemName = item.Name as string
-                const year = item.ProductionYear as number
+                const year = Math.round(playstate.PositionTicks / item.RunTimeTicks * 100 ) + "% Watched"
                 const artists = [(item.SeriesName as string) + " | " + (item.SeasonName as string)]
                 const image = item.ImageTags.Primary ?? item.ParentLogoImageTag as string
                 const kind = item.Type as string

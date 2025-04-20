@@ -21,7 +21,7 @@ client.on("ready", async () => {
         if (activity) {
             await client.user?.setActivity(activity as SetActivity);
             clearInterval(id);
-            id = setInterval(activeInterval, 1500);
+            id = setInterval(activeInterval, 3000);
         }
     }
     const activeInterval = async () => {
