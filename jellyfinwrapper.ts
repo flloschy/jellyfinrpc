@@ -80,7 +80,7 @@ export class Jellyfin {
                 const artists = item.Artists as string[]
                 const kind = item.Type as string
                 const id = item.Id as string
-                const parentId = item.ParentLogoItemId as string
+                const parentId = item.AlbumId as string
                 const artistIds = item.ArtistItems.map((a: any) => a.Id) as string[]
                 return {
                     id,
@@ -99,9 +99,9 @@ export class Jellyfin {
                 const length = item.RunTimeTicks / 10_000_000 as number
                 const listened = playstate.PositionTicks / 10_000_000 as number
                 const paused = playstate.IsPaused as boolean
-                const itemName = item.Name as string
+                const itemName = item.Name + " | "+ item.SeasonName
                 const year = Math.round(playstate.PositionTicks / item.RunTimeTicks * 100 ) + "% Watched"
-                const artists = [(item.SeriesName as string) + " | " + (item.SeasonName as string)]
+                const artists = [(item.SeriesName as string)]
                 const kind = item.Type as string
                 const id = item.Id as string
                 const parentId = item.ParentLogoItemId as string
@@ -151,7 +151,7 @@ export class Jellyfin {
             const playback = await this.getPlayback();
             if (!playback) return false;
             let smallImageKey = undefined;
-            for (const id of playback.artistIds.reverse()) {
+            for (const id of playback.artistIds) {
                 const url = this.url + `Items/${id}/Images/Primary`
                 const response = await fetch(url, {
                     method: "GET",
@@ -160,11 +160,14 @@ export class Jellyfin {
                         "Content-Type": "application/json",
                     },
                 })
-                if (response.ok) smallImageKey = url;
+                if (response.ok) {
+                    smallImageKey = url
+                    break;
+                };
             }
 
             let largeImageKey;
-            for (const id of [playback.parentId, playback.id]) {
+            for (const id of [playback.id, playback.parentId]) {
                 const url = this.url + `Items/${id}/Images/Primary`
                 const response = await fetch(url, {
                     method: "GET",
@@ -173,7 +176,10 @@ export class Jellyfin {
                         "Content-Type": "application/json",
                     },
                 })
-                if (response.ok) largeImageKey = url;
+                if (response.ok) {
+                    largeImageKey = url
+                    break;
+                };
             }
 
             return {
