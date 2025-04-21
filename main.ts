@@ -29,19 +29,23 @@ let dc = makeDiscord()
 dc.init()
 
 let lastrpc: UnderstandableRPC
+let repeats = 0;
 function preventSpam(rpc: UnderstandableRPC) {
     if (lastrpc == undefined) {
+        repeats = 0
         dc.rpc(rpc)
-    } else if (!(
+    } else if ((!(
         lastrpc.type == rpc.type &&
         lastrpc.title == rpc.title &&
         lastrpc.subtitle == rpc.subtitle &&
         lastrpc.largeImage?.url == rpc.largeImage?.url &&
         lastrpc.smallImage?.url == rpc.smallImage?.url &&
         lastrpc.paused == rpc.paused &&
-        lastrpc.timestamp?.end == rpc.timestamp?.end)) {
+        lastrpc.timestamp?.end == rpc.timestamp?.end)) || repeats == 15) {
+        repeats = 0
         dc.rpc(rpc)
     } else {
+        repeats++
         log("Duplicate update")
     }
     lastrpc = rpc
