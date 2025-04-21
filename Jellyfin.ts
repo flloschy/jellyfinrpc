@@ -63,7 +63,6 @@ export class Jellyfin {
             ],
             }).outputSync().stdout,
         ));
-        console.log(data)
         const session = (data as any[])
             .sort((a, b) =>
                 new Date(a.LastPlaybackCheckIn).getTime() -
