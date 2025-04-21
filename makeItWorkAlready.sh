@@ -1,7 +1,5 @@
-#!/bin/sh
-
-deno install
 npm install
+deno install
 echo
 
 echo "Jellyfin URL:"

@@ -88,7 +88,7 @@ setTimeout(() => {
             } else {
                 log(`Failed ${failCounter+1}/4`)
                 dc.rpc(undefined)
-                if (failCounter++ > 4) {
+                if (failCounter++ == 4) {
                     idle = true
                     log("Entering idle")
                     failCounter = 0

@@ -59,11 +59,11 @@ export class Jellyfin {
             args: [
                 `-H`,
                 `Authorization: ${this.header!}`,
-                `https://jellyfin.floschy.dev/Sessions?activeWithinSeconds=15`,
+                `${this.url}Sessions?activeWithinSeconds=15`,
             ],
             }).outputSync().stdout,
         ));
-
+        console.log(data)
         const session = (data as any[])
             .sort((a, b) =>
                 new Date(a.LastPlaybackCheckIn).getTime() -
@@ -210,7 +210,7 @@ export class Jellyfin {
                 case "Movie": return await this.rpcFromMovie(session);
                 case "Episode": return await this.rpcFromEpisode(session);
             }
-        } catch {/*Empty*/}
+        } catch {}
         return
     }
 
