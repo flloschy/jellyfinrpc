@@ -50,7 +50,7 @@ export class Jellyfin {
       'Client="RPC", ' +
       'Device="Chrome", ' +
       'DeviceId="idk", ' +
-      'Version="0.0.1", ' +
+      'Version="1.0.0", ' +
       `Token="${token}", `;
   }
 
@@ -87,7 +87,7 @@ export class Jellyfin {
         const kind = item.Type as string;
         const id = item.Id as string;
         const parentId = item.AlbumId as string;
-        const parentName = (item.Album ?? "Album Cover") as string;
+        const parentName = (item.Album ?? "No Album") as string;
         const artistIds = item.ArtistItems as any[];
         return {
           id,
@@ -107,11 +107,10 @@ export class Jellyfin {
         const length = item.RunTimeTicks / 10_000_000 as number;
         const listened = playstate.PositionTicks / 10_000_000 as number;
         const paused = playstate.IsPaused as boolean;
-        const itemName = item.Name + " | " + item.SeasonName;
-        const year =
-          Math.round(playstate.PositionTicks / item.RunTimeTicks * 100) +
-          "% Progress";
-        const artists = [item.SeriesName as string];
+        const itemName = item.Name as string;
+        const year = item.SeasonName as string;
+        const artists = [] as string[];
+        const parentName = item.SeriesName as string;
         const kind = item.Type as string;
         const id = item.Id as string;
         const parentId = item.ParentLogoItemId as string;
@@ -119,6 +118,7 @@ export class Jellyfin {
         return {
           id,
           parentId,
+          parentName,
           length,
           listened,
           paused,
@@ -134,9 +134,7 @@ export class Jellyfin {
         const listened = playstate.PositionTicks / 10_000_000 as number;
         const paused = playstate.IsPaused as boolean;
         const itemName = item.Name as string;
-        const year =
-          Math.round(playstate.PositionTicks / item.RunTimeTicks * 100) +
-          "% Progress";
+        const year = undefined
         const artists = [""];
         const kind = item.Type as string;
         const id = item.Id as string;
@@ -145,6 +143,7 @@ export class Jellyfin {
         return {
           id,
           parentId,
+          parentName: undefined,
           length,
           listened,
           paused,
@@ -185,10 +184,7 @@ export class Jellyfin {
       let largeImageKey;
       let largeImageText;
       for (
-        const [id, text] of [[playback.id, playback.itemName], [
-          playback.parentId,
-          playback.parentName,
-        ]]
+        const id of [playback.id, playback.parentId]
       ) {
         const url = this.url + `Items/${id}/Images/Primary`;
         const response = await fetch(url, {
@@ -200,7 +196,7 @@ export class Jellyfin {
         });
         if (response.ok) {
           largeImageKey = url;
-          largeImageText ??= text;
+          largeImageText ??= playback.parentName;
           break;
         }
       }
@@ -212,7 +208,7 @@ export class Jellyfin {
         }`,
         type: playback.kind == "Audio"
           ? ActivityType.Listening
-          : ActivityType.Streaming,
+          : ActivityType.Watching,
         startTimestamp: playback.paused
           ? undefined
           : Math.floor(Date.now() / 1000 - playback.listened),
@@ -225,7 +221,6 @@ export class Jellyfin {
         smallImageText,
       };
     } catch (e) {
-      console.log(e);
       return false;
     }
   }

@@ -24,7 +24,7 @@ function run() {
     let idle = false;
     let counter = 0;
     id = setInterval(async () => {
-      if (idle && counter == 10) {
+      if (idle && counter == 8) {
         counter = 0;
         const activity = await jf.getActivity();
         if (activity) {
@@ -46,7 +46,7 @@ function run() {
           }
         }
       }
-    }, 3000);
+    }, 5000);
   });
 
   client.login();
