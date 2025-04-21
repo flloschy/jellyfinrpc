@@ -160,21 +160,23 @@ export class Jellyfin {
     try {
       const playback = await this.getPlayback();
       if (!playback) return false;
-      let smallImageKey = undefined;
-      for (const id of playback.artistIds) {
-        const url = this.url + `Items/${id}/Images/Primary`;
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            Authorization: this.header!,
-            "Content-Type": "application/json",
-          },
-        });
-        if (response.ok) {
-          smallImageKey = url;
-          break;
+      let smallImageKey = playback.paused ? "pause" : undefined;
+      if (smallImageKey) {
+        for (const id of playback.artistIds) {
+            const url = this.url + `Items/${id}/Images/Primary`;
+            const response = await fetch(url, {
+                method: "GET",
+                headers: {
+                    Authorization: this.header!,
+                    "Content-Type": "application/json",
+                },
+            });
+            if (response.ok) {
+                smallImageKey = url;
+                break;
+            }
         }
-      }
+    }
 
       let largeImageKey;
       for (const id of [playback.id, playback.parentId]) {
