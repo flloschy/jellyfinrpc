@@ -68,8 +68,8 @@ export class Jellyfin {
 
     const session = (data as any[])
       .sort((a, b) =>
-        new Date(a.LastActivityDate).getTime() -
-        new Date(b.LastActivityDate).getTime()
+        new Date(a.LastPlaybackCheckIn).getTime() -
+        new Date(b.LastPlaybackCheckIn).getTime()
       )
       .at(-1);
 
@@ -87,10 +87,12 @@ export class Jellyfin {
         const kind = item.Type as string;
         const id = item.Id as string;
         const parentId = item.AlbumId as string;
-        const artistIds = item.ArtistItems.map((a: any) => a.Id) as string[];
+        const parentName = (item.Album ?? "Album Cover") as string;
+        const artistIds = item.ArtistItems as any[];
         return {
           id,
           parentId,
+          parentName,
           length,
           listened,
           paused,
@@ -113,7 +115,7 @@ export class Jellyfin {
         const kind = item.Type as string;
         const id = item.Id as string;
         const parentId = item.ParentLogoItemId as string;
-        const artistIds = [] as string[];
+        const artistIds = [] as any[];
         return {
           id,
           parentId,
@@ -139,7 +141,7 @@ export class Jellyfin {
         const kind = item.Type as string;
         const id = item.Id as string;
         const parentId = item.ParentLogoItemId as string;
-        const artistIds = [] as string[];
+        const artistIds = [] as any[];
         return {
           id,
           parentId,
@@ -161,9 +163,10 @@ export class Jellyfin {
       const playback = await this.getPlayback();
       if (!playback) return false;
       let smallImageKey = playback.paused ? "pause" : undefined;
+      let smallImageText = playback.paused ? "paused" : undefined;
       if (!smallImageKey) {
-        for (const id of playback.artistIds) {
-          const url = this.url + `Items/${id}/Images/Primary`;
+        for (const { Id, Name } of playback.artistIds) {
+          const url = this.url + `Items/${Id}/Images/Primary`;
           const response = await fetch(url, {
             method: "GET",
             headers: {
@@ -173,13 +176,20 @@ export class Jellyfin {
           });
           if (response.ok) {
             smallImageKey = url;
+            smallImageText = Name;
             break;
           }
         }
       }
 
       let largeImageKey;
-      for (const id of [playback.id, playback.parentId]) {
+      let largeImageText;
+      for (
+        const [id, text] of [[playback.id, playback.itemName], [
+          playback.parentId,
+          playback.parentName,
+        ]]
+      ) {
         const url = this.url + `Items/${id}/Images/Primary`;
         const response = await fetch(url, {
           method: "GET",
@@ -190,6 +200,7 @@ export class Jellyfin {
         });
         if (response.ok) {
           largeImageKey = url;
+          largeImageText ??= text;
           break;
         }
       }
@@ -209,7 +220,9 @@ export class Jellyfin {
           Date.now() / 1000 + (playback.length - playback.listened),
         ),
         largeImageKey,
+        largeImageText,
         smallImageKey,
+        smallImageText,
       };
     } catch (e) {
       console.log(e);

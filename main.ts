@@ -16,8 +16,9 @@ function run() {
   });
 
   let id: number;
-  client.on("ready", () => {
+  client.on("ready", async () => {
     console.log("alive!");
+    await client.user?.clearActivity();
 
     let failCounter = 0;
     let idle = false;
