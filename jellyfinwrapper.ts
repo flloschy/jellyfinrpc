@@ -55,15 +55,6 @@ export class Jellyfin {
   }
 
   async getPlayback() {
-    const response = await fetch(this.url + "Sessions", {
-      method: "GET",
-      headers: {
-        Authorization: this.header!,
-        "accept-encoding": "identity", // https://github.com/denoland/deno/issues/25992
-        "Content-Type": "application/json",
-      },
-    });
-
     // workaround bc:https://github.com/denoland/deno/issues/25992
     const data = JSON.parse(new TextDecoder().decode(
       new Deno.Command("curl", {
