@@ -161,7 +161,7 @@ export class Jellyfin {
       const playback = await this.getPlayback();
       if (!playback) return false;
       let smallImageKey = playback.paused ? "pause" : undefined;
-      if (smallImageKey) {
+      if (!smallImageKey) {
         for (const id of playback.artistIds) {
             const url = this.url + `Items/${id}/Images/Primary`;
             const response = await fetch(url, {
