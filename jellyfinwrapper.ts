@@ -57,11 +57,22 @@ export class Jellyfin {
             method: "GET",
             headers: {
                 Authorization: this.header!,
+                'accept-encoding': 'identity', // https://github.com/denoland/deno/issues/25992
                 "Content-Type": "application/json",
-            },
-        })
+            }
+        });
 
-        const data = await response.json()
+        
+        // workaround bc:https://github.com/denoland/deno/issues/25992
+        const data = JSON.parse(new TextDecoder().decode(
+            new Deno.Command("curl", {
+                args: [
+                    `-H`,
+                    `Authorization: ${this.header!}`,
+                    `https://jellyfin.floschy.dev/Sessions`
+                ]
+            }).outputSync().stdout))
+
         const session = (data as any[])
             .sort((a, b) => new Date(a.LastActivityDate).getTime() - new Date(b.LastActivityDate).getTime())
             .at(-1)
@@ -191,6 +202,7 @@ export class Jellyfin {
                 smallImageKey
             }
         } catch (e) {
+            console.log(e)
             return false;
         }
     }

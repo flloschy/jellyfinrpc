@@ -20,34 +20,33 @@ function run() {
     client.on("ready", () => {
         console.log("alive!")
     
-
         let failCounter = 0
-        const passiveInterval = async () => {
-            const activity = await jf.getActivity()
-            if (activity) {
-                failCounter = 0
-                await client.user?.setActivity(activity as SetActivity);
-                clearInterval(id);
-                id = setInterval(activeInterval, 3000);
-            }
-        }
-        const activeInterval = async () => {
-            const activity = await jf.getActivity()
-            if (activity) {
-                failCounter = 0
-                await client.user?.setActivity(activity as SetActivity);
+        let idle = false
+        let counter = 0
+        id = setInterval(async ()=>{
+            if (idle && counter == 10) {
+                counter = 0
+                const activity = await jf.getActivity()
+                if (activity) {
+                    await client.user?.setActivity(activity as SetActivity);
+                    idle = false
+                }
+            } else if (idle) {
+                counter++
             } else {
-                failCounter++
-                if (failCounter >= 2) {
+                const activity = await jf.getActivity()
+                if (activity) {
+                    failCounter = 0
+                    await client.user?.setActivity(activity as SetActivity);
+                } else {
+                    failCounter++
                     await client.user?.clearActivity();
-                }
-                if (failCounter == 4) {
-                    clearInterval(id);
-                    id = setInterval(passiveInterval, 30000);
+                    if (failCounter == 4) {
+                        idle = true
+                    }
                 }
             }
-        }
-        id = setInterval(passiveInterval, 30000);
+        }, 3000);
     });
     
     client.login();
