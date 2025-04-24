@@ -231,6 +231,7 @@ export class ClientSideDiscord extends Discord {
         if (!this.connected) return
         log("RPC update")
         if (!data) return this.client.user?.clearActivity()
+        
         const realData:SetActivity= {
             // @ts-ignore its ok
             type: data.type,
@@ -239,7 +240,7 @@ export class ClientSideDiscord extends Discord {
             smallImageKey: data.smallImage?.url,
             smallImageText: data.smallImage?.tooltip,
             largeImageKey: data.largeImage?.url,
-            largeImageText: data.largeImage?.tooltip,
+            largeImageText: data.largeImage?.tooltip == data.title ? undefined : data.largeImage?.tooltip,
             startTimestamp: data.paused ? undefined : data.timestamp?.start,
             endTimestamp: data.paused ? undefined : data.timestamp?.end
         }        
