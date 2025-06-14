@@ -14,16 +14,7 @@ echo "Jellyfin Password:"
 read password
 echo
 
-echo "Run on server (true/false)"
-read server
-echo 
-
-if [ $server = "true" ]; then
-    echo "Discord Token"
-    read token
-    echo
-fi
-
+echo "" > .env
 echo "jellyfin_url=\"$url\"" >> .env
 echo "jellyfin_user=\"$user\"" >> .env
 echo "jellyfin_password=\"$password\"" >> .env
@@ -35,6 +26,12 @@ echo
 echo 
 echo "Use the following command to run at startup"
 echo 
-echo "cd $(pwd) && deno run --allow-net --allow-env --allow-run --env-file --allow-read --allow-write main.ts"
+echo "cd $(pwd) && deno run --allow-net --allow-env --allow-run --env-file --allow-read --allow-write src/main.ts"
 echo 
-echo "Have Fun"
+echo 
+echo "Or this when you want to keep the logs"
+echo 
+echo "cd $(pwd) && deno run --allow-net --allow-env --allow-run --env-file --allow-read --allow-write src/main.ts >> logs"
+echo 
+echo 
+echo "Have Fun!"
