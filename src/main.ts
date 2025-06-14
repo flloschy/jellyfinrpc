@@ -41,7 +41,7 @@ async function activeLoop() {
             if (++repeatCounter < 10) {
                 return
             }
-            log("active", "updating anyway to keep connection alive")
+            log("active", "Updating anyway to keep RPC alive")
         }
         repeatCounter = 0;
         dc_instance.updateRpc(rpc)

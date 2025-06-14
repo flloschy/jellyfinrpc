@@ -65,14 +65,14 @@ export class Jellyfin {
         const data = execCmd("curl", [
             `-H`,
             `Authorization: ${this.header}`,
-            `${this.url}Sessions?activeWithinSeconds=15`,
+            `${this.url}Sessions`,
         ])
         const json = JSON.parse(data) as jf_api_Sessions[];
 
         const userSessions = json.filter((session) => session.UserName == env("jellyfin_user"))
 
         const sessions = userSessions.sort((a, b) => 
-            new Date(a.LastPlaybackCheckIn).getTime() - 
+            new Date(a.LastPlaybackCheckIn).getTime() -
             new Date(b.LastPlaybackCheckIn).getTime()
         )
 

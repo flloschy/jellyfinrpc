@@ -66,7 +66,7 @@ async function audio(session: jf_api_Sessions): Promise<UnderstandableRPC> {
         },
     ]);
 
-    const smallImage = await findImage(
+    const smallImage = paused ? pausedImg(true) : await findImage(
         session.NowPlayingItem.ArtistItems.map((a) => ({
             itemId: a.Id,
             itemName: a.Name,
